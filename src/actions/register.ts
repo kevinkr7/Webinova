@@ -17,12 +17,13 @@ export const registerParticipantFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => registrationSchema.parse(data))
   .handler(async ({ data }) => {
     // 1. Setup Supabase Admin Client
-    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || "";
+    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL || "";
     const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "");
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Server configuration missing");
+      const keys = typeof process !== 'undefined' && process.env ? Object.keys(process.env).filter(k => k.includes('SUPABASE')).join(', ') : 'No process.env';
+      throw new Error(`Server configuration missing. URL present: ${!!supabaseUrl}, Key present: ${!!supabaseServiceKey}. Available related env keys: ${keys}`);
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
@@ -61,7 +62,7 @@ export const registerParticipantFn = createServerFn({ method: "POST" })
     }
 
     // 5. Send Email via Sender.net API
-    const senderApiKey = process.env.SENDER_API_KEY;
+    const senderApiKey = process.env.SENDER_API_KEY || import.meta.env.SENDER_API_KEY;
     if (!senderApiKey) {
       console.error("Missing SENDER_API_KEY");
       // Update DB to failed but don't fail registration
