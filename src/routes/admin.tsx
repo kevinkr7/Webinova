@@ -501,6 +501,74 @@ function ConfigurationTab() {
 
         <section>
           <h2 className="text-xl font-bold uppercase border-b-4 border-ink pb-2 mb-4">
+            Audience / Who is this for?
+          </h2>
+          <Field
+            label="Section Heading"
+            value={config.audience.heading || "WHO IS THIS FOR?"}
+            onChange={(v: string) =>
+              setConfig({ ...config, audience: { ...config.audience, heading: v } })
+            }
+          />
+          <Field
+            label="Audience Note (Optional One-Line Description)"
+            value={config.audience.note}
+            onChange={(v: string) => setConfig({ ...config, audience: { ...config.audience, note: v } })}
+          />
+          
+          <div className="mt-4">
+            <label className="label-mono block mb-2">Audience Classifications</label>
+            {config.audience.blocks?.map((b: any, i: number) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  className="brut-input w-20"
+                  value={b.index}
+                  onChange={(e) => {
+                    const newBlocks = [...(config.audience.blocks || [])];
+                    newBlocks[i] = { ...newBlocks[i], index: e.target.value };
+                    setConfig({ ...config, audience: { ...config.audience, blocks: newBlocks } });
+                  }}
+                  placeholder="Index (e.g. 01)"
+                />
+                <input
+                  type="text"
+                  className="brut-input flex-1"
+                  value={b.label}
+                  onChange={(e) => {
+                    const newBlocks = [...(config.audience.blocks || [])];
+                    newBlocks[i] = { ...newBlocks[i], label: e.target.value };
+                    setConfig({ ...config, audience: { ...config.audience, blocks: newBlocks } });
+                  }}
+                  placeholder="Classification (e.g. 1ST YEAR)"
+                />
+                <button
+                  type="button"
+                  className="brut-btn px-4"
+                  onClick={() => {
+                    const newBlocks = (config.audience.blocks || []).filter((_: any, idx: number) => idx !== i);
+                    setConfig({ ...config, audience: { ...config.audience, blocks: newBlocks } });
+                  }}
+                >
+                  X
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="brut-btn text-sm mt-2"
+              onClick={() => {
+                const newBlocks = [...(config.audience.blocks || []), { index: `0${(config.audience.blocks?.length || 0) + 1}`, label: "" }];
+                setConfig({ ...config, audience: { ...config.audience, blocks: newBlocks } });
+              }}
+            >
+              + ADD CLASSIFICATION
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold uppercase border-b-4 border-ink pb-2 mb-4">
             People (Speaker & Organizer)
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -533,6 +601,22 @@ function ConfigurationTab() {
               }
             />
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <Field
+              label="Co-Organizer Name"
+              value={config.coOrganizer.name}
+              onChange={(v: string) =>
+                setConfig({ ...config, coOrganizer: { ...config.coOrganizer, name: v } })
+              }
+            />
+            <Field
+              label="Co-Organizer Role"
+              value={config.coOrganizer.role}
+              onChange={(v: string) =>
+                setConfig({ ...config, coOrganizer: { ...config.coOrganizer, role: v } })
+              }
+            />
+          </div>
           <Field
             label="Speaker Bio"
             isTextArea
@@ -541,6 +625,81 @@ function ConfigurationTab() {
               setConfig({ ...config, speaker: { ...config.speaker, bio: v } })
             }
           />
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold uppercase border-b-4 border-ink pb-2 mb-4">
+            Outcomes
+          </h2>
+          {config.outcomes.map((o: any, i: number) => (
+            <Field
+              key={i}
+              label={`Outcome ${o.index}`}
+              value={o.text}
+              onChange={(v: string) => {
+                const newOutcomes = [...config.outcomes];
+                newOutcomes[i] = { ...newOutcomes[i], text: v };
+                setConfig({ ...config, outcomes: newOutcomes });
+              }}
+            />
+          ))}
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold uppercase border-b-4 border-ink pb-2 mb-4">
+            Timeline
+          </h2>
+          {config.timeline.map((t: any, i: number) => (
+            <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <Field
+                label={`Timeline ${i + 1} - Time`}
+                value={t.time}
+                onChange={(v: string) => {
+                  const newTimeline = [...config.timeline];
+                  newTimeline[i] = { ...newTimeline[i], time: v };
+                  setConfig({ ...config, timeline: newTimeline });
+                }}
+              />
+              <Field
+                label={`Timeline ${i + 1} - Label`}
+                value={t.label}
+                onChange={(v: string) => {
+                  const newTimeline = [...config.timeline];
+                  newTimeline[i] = { ...newTimeline[i], label: v };
+                  setConfig({ ...config, timeline: newTimeline });
+                }}
+              />
+            </div>
+          ))}
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold uppercase border-b-4 border-ink pb-2 mb-4">
+            FAQ
+          </h2>
+          {config.faq.map((f: any, i: number) => (
+            <div key={i} className="mb-4">
+              <Field
+                label={`FAQ ${f.index} - Question`}
+                value={f.question}
+                onChange={(v: string) => {
+                  const newFaq = [...config.faq];
+                  newFaq[i] = { ...newFaq[i], question: v };
+                  setConfig({ ...config, faq: newFaq });
+                }}
+              />
+              <Field
+                label={`FAQ ${f.index} - Answer`}
+                isTextArea
+                value={f.answer}
+                onChange={(v: string) => {
+                  const newFaq = [...config.faq];
+                  newFaq[i] = { ...newFaq[i], answer: v };
+                  setConfig({ ...config, faq: newFaq });
+                }}
+              />
+            </div>
+          ))}
         </section>
 
         <section>
@@ -573,6 +732,21 @@ function ConfigurationTab() {
             label="Copyright Text"
             value={config.copyright}
             onChange={(v: string) => setConfig({ ...config, copyright: v })}
+          />
+          <Field
+            label="Final CTA Heading"
+            value={config.finalCta.heading}
+            onChange={(v: string) =>
+              setConfig({ ...config, finalCta: { ...config.finalCta, heading: v } })
+            }
+          />
+          <Field
+            label="Final CTA Message"
+            isTextArea
+            value={config.finalCta.message}
+            onChange={(v: string) =>
+              setConfig({ ...config, finalCta: { ...config.finalCta, message: v } })
+            }
           />
         </section>
 

@@ -9,18 +9,18 @@ export function Who() {
       <SectionLabel>
         <span>03</span>
         <span>/</span>
-        <span>WHO IS THIS FOR?</span>
+        <span>{eventConfig.audience?.heading || "WHO IS THIS FOR?"}</span>
       </SectionLabel>
 
-      <div className="grid md:grid-cols-2">
+      <div className={`grid ${eventConfig.audience.blocks.length === 1 ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
         {eventConfig.audience.blocks.map((b, i) => (
           <Reveal
             key={b.index}
-            from={i === 0 ? "left" : "right"}
+            from={i % 2 === 0 ? "left" : "right"}
             delay={i * 100}
             className={[
               "group flex items-baseline gap-4 border-ink px-4 py-12 transition-colors duration-75 hover:bg-ink hover:text-paper sm:px-6 sm:py-20",
-              i === 0 ? "border-b-4 md:border-b-0 md:border-r-4" : "",
+              eventConfig.audience.blocks.length > 1 && i === 0 ? "border-b-4 md:border-b-0 md:border-r-4" : "",
             ].join(" ")}
           >
             <span className="display text-4xl text-accent sm:text-5xl">{b.index}</span>

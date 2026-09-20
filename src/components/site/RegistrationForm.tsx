@@ -8,8 +8,8 @@ const registrationSchema = z.object({
   email: z.string().trim().email("ENTER A VALID EMAIL").max(255, "TOO LONG (MAX 255)"),
   registerNumber: z.string().trim().min(2, "ENTER YOUR REGISTER NUMBER").max(50, "TOO LONG"),
   year: z.string().trim().min(1, "SELECT YOUR YEAR"),
-  department: z.string().trim().min(2, "ENTER YOUR DEPARTMENT").max(100, "TOO LONG"),
-  college: z.string().trim().min(2, "ENTER YOUR COLLEGE").max(150, "TOO LONG"),
+  department: z.string().trim().min(1, "SELECT YOUR DEPARTMENT").max(100, "TOO LONG"),
+  college: z.string().trim().min(1, "SELECT YOUR COLLEGE").max(150, "TOO LONG"),
 });
 
 export type RegistrationInput = z.infer<typeof registrationSchema>;
@@ -20,13 +20,14 @@ async function submitRegistration(data: RegistrationInput): Promise<void> {
   await registerParticipantFn({ data });
 }
 
-const fields = [
+const textFields = [
   { name: "fullName", label: "FULL NAME", type: "text", autoComplete: "name" },
   { name: "email", label: "EMAIL", type: "email", autoComplete: "email" },
-  { name: "registerNumber", label: "REGISTER NUMBER / STUDENT ID", type: "text" },
-  { name: "department", label: "DEPARTMENT", type: "text" },
-  { name: "college", label: "COLLEGE", type: "text" },
+  { name: "registerNumber", label: "REGISTER NUMBER / ROLL NUMBER", type: "text" },
 ] as const;
+
+const DEPARTMENTS = ["AI&DS", "ECE", "EEE", "CSE", "IT", "CSBS", "CSE (CS)", "Others"];
+const COLLEGES = ["Dr. N.G.P. Institute of Technology", "Others"];
 
 export function RegistrationForm() {
   const eventConfig = useEventConfig();
@@ -79,7 +80,7 @@ export function RegistrationForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="grid md:grid-cols-2">
-      {fields.map((f, i) => (
+      {textFields.map((f, i) => (
         <div
           key={f.name}
           className={["border-b-4 border-ink p-4 sm:p-6", i % 2 === 0 ? "md:border-r-4" : ""].join(
@@ -94,19 +95,71 @@ export function RegistrationForm() {
             name={f.name}
             type={f.type}
             autoComplete={"autoComplete" in f ? f.autoComplete : undefined}
-            aria-invalid={Boolean(errors[f.name])}
-            aria-describedby={errors[f.name] ? `${f.name}-error` : undefined}
+            aria-invalid={Boolean(errors[f.name as keyof Errors])}
+            aria-describedby={errors[f.name as keyof Errors] ? `${f.name}-error` : undefined}
             className="brut-input mt-3"
           />
-          {errors[f.name] ? (
+          {errors[f.name as keyof Errors] ? (
             <p id={`${f.name}-error`} className="label-mono mt-2 text-accent">
-              ! {errors[f.name]}
+              ! {errors[f.name as keyof Errors]}
             </p>
           ) : null}
         </div>
       ))}
 
+      <div className="border-b-4 border-ink p-4 sm:p-6">
+        <label htmlFor="department" className="label-mono block">
+          DEPARTMENT
+        </label>
+        <select
+          id="department"
+          name="department"
+          defaultValue=""
+          aria-invalid={Boolean(errors.department)}
+          aria-describedby={errors.department ? "department-error" : undefined}
+          className="brut-input mt-3"
+        >
+          <option value="">— SELECT —</option>
+          {DEPARTMENTS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+        {errors.department ? (
+          <p id="department-error" className="label-mono mt-2 text-accent">
+            ! {errors.department}
+          </p>
+        ) : null}
+      </div>
+
       <div className="border-b-4 border-ink p-4 sm:p-6 md:border-r-4">
+        <label htmlFor="college" className="label-mono block">
+          COLLEGE
+        </label>
+        <select
+          id="college"
+          name="college"
+          defaultValue=""
+          aria-invalid={Boolean(errors.college)}
+          aria-describedby={errors.college ? "college-error" : undefined}
+          className="brut-input mt-3"
+        >
+          <option value="">— SELECT —</option>
+          {COLLEGES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        {errors.college ? (
+          <p id="college-error" className="label-mono mt-2 text-accent">
+            ! {errors.college}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="border-b-4 border-ink p-4 sm:p-6">
         <label htmlFor="year" className="label-mono block">
           YEAR
         </label>

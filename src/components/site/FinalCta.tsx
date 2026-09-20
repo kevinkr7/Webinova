@@ -11,9 +11,9 @@ export function FinalCta() {
     <section className="overflow-hidden border-b-4 border-ink bg-accent text-accent-foreground">
       <div className="border-b-4 border-ink px-4 py-12 sm:px-6 sm:py-20">
         <h2 ref={headingRef} className="display text-[16vw] leading-[0.82] will-change-transform">
-          READY
+          {eventConfig.finalCta.heading.split(" ")[0] || "READY"}
           <br />
-          TO CODE?
+          {eventConfig.finalCta.heading.split(" ").slice(1).join(" ") || "TO CODE?"}
         </h2>
         <Reveal>
           <p className="label-mono mt-8 max-w-2xl">{eventConfig.finalCta.message}</p>

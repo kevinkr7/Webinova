@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { EventConfigProvider } from "../context/EventConfigContext";
+import { LenisProvider } from "../components/LenisProvider";
 
 function NotFoundComponent() {
   return (
@@ -126,8 +127,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <EventConfigProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        <LenisProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </LenisProvider>
       </EventConfigProvider>
     </QueryClientProvider>
   );

@@ -100,8 +100,8 @@ export const registerParticipantFn = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           to: { email: data.email, name: data.fullName },
-          from: { email: "organizer@kevinography.in", name: "CODING DEMYSTIFIED" },
-          subject: "You're registered for CODING DEMYSTIFIED.",
+          from: { email: "organizer@kevinography.in", name: "IDEAS UNLEASHED" },
+          subject: "IDEAS UNLEASHED",
           html: htmlContent,
         }),
       });

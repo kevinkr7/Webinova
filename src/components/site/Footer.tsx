@@ -6,9 +6,13 @@ export function Footer() {
   return (
     <footer className="bg-ink text-paper">
       <div className="display border-b-4 border-paper px-4 py-8 text-[13vw] leading-[0.85] sm:px-6">
-        CODING
-        <br />
-        DEMYSTIFIED
+        {eventConfig.name.split(" ")[0] || "CODING"}
+        {eventConfig.name.split(" ").length > 1 && (
+          <>
+            <br />
+            {eventConfig.name.split(" ").slice(1).join(" ")}
+          </>
+        )}
       </div>
 
       <div className="grid border-b-4 border-paper sm:grid-cols-3">

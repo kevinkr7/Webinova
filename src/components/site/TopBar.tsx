@@ -21,7 +21,7 @@ export function TopBar() {
       {/* scroll progress: hard bar, no easing */}
       <div
         aria-hidden
-        className="h-1 origin-left bg-ink"
+        className="absolute left-0 right-0 bottom-0 h-1 origin-left bg-ink z-10"
         style={{ transform: `scaleX(${progress})` }}
       />
     </header>

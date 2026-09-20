@@ -26,71 +26,79 @@ export function generateEmailTemplate(
   const date = sanitize(eventConfig.date);
   const time = sanitize(eventConfig.time);
 
+  const eventName = sanitize(eventConfig.name);
+
   return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Registration Confirmed</title>
+      <title>Registration Confirmed - ${eventName}</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4ef; color: #222222; font-family: 'JetBrains Mono', 'Courier New', monospace; line-height: 1.6;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #f4f4ef; padding: 40px 20px;">
+    <body style="margin: 0; padding: 0; background-color: #e5e5e5; color: #111111; font-family: 'JetBrains Mono', 'Courier New', monospace; line-height: 1.6;">
+      <div style="max-width: 800px; margin: 40px auto; background-color: #f4f4ef; padding: 0; border: 8px solid #111111; box-shadow: 12px 12px 0px #111111;">
         
         <!-- HEADER -->
-        <div style="border-bottom: 4px solid #222222; padding-bottom: 20px; margin-bottom: 40px;">
-          <h1 style="font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 32px; font-weight: 900; text-transform: uppercase; margin: 0 0 10px 0; line-height: 1; color: #222222;">
-            CODING DEMYSTIFIED
-          </h1>
-          <p style="font-size: 14px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin: 0; color: #222222;">
-            REGISTRATION CONFIRMED // 2026
+        <div style="background-color: #111111; color: #f4f4ef; padding: 40px 30px; border-bottom: 8px solid #111111;">
+          <p style="font-size: 16px; font-weight: bold; letter-spacing: 4px; text-transform: uppercase; margin: 0 0 10px 0; color: #e40011;">
+            // TICKET SECURED
           </p>
+          <h1 style="font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 48px; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; word-break: break-word;">
+            ${eventName}
+          </h1>
         </div>
         
-        <!-- MESSAGE -->
-        <p style="font-size: 18px; margin-bottom: 20px; font-weight: bold; color: #222222;">Hi ${fName},</p>
-        <p style="color: #222222; font-size: 16px;">Your registration has been successfully confirmed.</p>
-        
-        <!-- BRUTALIST INFO BLOCK -->
-        <div style="border: 4px solid #222222; margin: 30px 0;">
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">PARTICIPANT</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${fullName}</div>
+        <div style="padding: 40px 30px;">
+          <!-- MESSAGE -->
+          <p style="font-size: 22px; margin-bottom: 30px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">
+            WELCOME ABOARD, <span style="background-color: #e40011; padding: 0 8px;">${fName}</span>
+          </p>
+          <p style="font-size: 18px; margin-bottom: 40px; border-left: 4px solid #111111; padding-left: 15px;">
+            Your registration has been successfully verified and confirmed.
+          </p>
+          
+          <!-- BRUTALIST INFO BLOCK -->
+          <div style="border: 4px solid #111111; background-color: #ffffff; display: block;">
+            <div style="border-bottom: 4px solid #111111; padding: 20px;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #666666;">PARTICIPANT</div>
+              <div style="font-size: 20px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">${fullName}</div>
+            </div>
+            <div style="border-bottom: 4px solid #111111; padding: 20px; background-color: #111111; color: #f4f4ef;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #aaaaaa;">PARTICIPANT ID</div>
+              <div style="font-size: 20px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #e40011;">${pId}</div>
+            </div>
+            <div style="border-bottom: 4px solid #111111; padding: 20px;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #666666;">DEPARTMENT / YEAR</div>
+              <div style="font-size: 18px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">${dept} / ${year}</div>
+            </div>
+            <div style="border-bottom: 4px solid #111111; padding: 20px;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #666666;">EVENT</div>
+              <div style="font-size: 18px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">${eventName}</div>
+            </div>
+            <div style="border-bottom: 4px solid #111111; padding: 20px; background-color: #e40011;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #111111;">DATE</div>
+              <div style="font-size: 24px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">${date}</div>
+            </div>
+            <div style="padding: 20px; background-color: #e40011;">
+              <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #111111;">TIME</div>
+              <div style="font-size: 24px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase;">${time}</div>
+            </div>
           </div>
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">PARTICIPANT ID</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${pId}</div>
-          </div>
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">YEAR</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${year}</div>
-          </div>
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">DEPARTMENT</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${dept}</div>
-          </div>
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">EVENT</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">CODING DEMYSTIFIED</div>
-          </div>
-          <div style="border-bottom: 4px solid #222222; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">DATE</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${date}</div>
-          </div>
-          <div style="padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; color: #222222;">TIME</div>
-            <div style="font-size: 16px; font-weight: bold; font-family: 'Archivo Black', 'Arial Black', sans-serif; text-transform: uppercase; color: #222222;">${time}</div>
-          </div>
-        </div>
 
-        <p style="font-weight: bold; color: #222222;">Keep this email for your event details.</p>
-        <p style="color: #222222;">Your Microsoft Teams joining link will be sent separately before the event.</p>
-        
-        <!-- FOOTER -->
-        <div style="margin-top: 40px; border-top: 4px solid #222222; padding-top: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; color: #222222;">
-          CODING DEMYSTIFIED<br>
-          ${org}<br>
-          organizer@kevinography.in
+          <div style="margin-top: 40px; padding: 20px; border: 4px dashed #111111; text-align: center;">
+            <p style="font-weight: bold; font-size: 18px; margin: 0 0 10px 0; text-transform: uppercase;">Keep this email for your event details.</p>
+            <p style="margin: 0; font-size: 14px;">Your Microsoft Teams joining link will be sent separately before the event.</p>
+          </div>
+          
+          <!-- FOOTER -->
+          <div style="margin-top: 40px; border-top: 8px solid #111111; padding-top: 20px;">
+            <div style="font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 24px; text-transform: uppercase; margin-bottom: 5px;">${eventName}</div>
+            <div style="font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px;">${org}</div>
+            <div style="font-size: 14px; font-weight: bold; color: #666666;">
+              organizer@kevinography.in
+            </div>
+          </div>
         </div>
       </div>
     </body>

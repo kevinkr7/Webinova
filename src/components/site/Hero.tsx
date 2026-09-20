@@ -25,12 +25,12 @@ export function Hero() {
       </div>
 
       <div className="px-4 pb-4 pt-6 sm:px-6 sm:pt-10">
-        <h1 className="display text-[19vw] leading-[0.82] sm:text-[16vw] lg:text-[13.5vw]">
+        <h1 className="display text-[12vw] leading-[0.85] sm:text-[14vw] lg:text-[13.5vw]">
           <span ref={lineOne} className="block will-change-transform">
-            CODING
+            {eventConfig.name.split(" ")[0] || "CODING"}
           </span>
           <span ref={lineTwo} className="-mt-[0.06em] block text-accent will-change-transform">
-            DEMYSTIFIED
+            {eventConfig.name.split(" ").slice(1).join(" ") || "DEMYSTIFIED"}
           </span>
         </h1>
       </div>

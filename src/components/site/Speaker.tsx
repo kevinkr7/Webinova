@@ -38,7 +38,7 @@ export function Speaker() {
           </div>
         </div>
 
-        <div className="border-t-4 border-ink lg:border-t-0">
+        <div className="border-t-4 border-ink lg:border-t-0 flex flex-col h-full">
           <Reveal from="right">
             <div className="display border-b-4 border-ink px-4 py-6 text-4xl sm:px-6 sm:text-6xl">
               {s.name}
@@ -47,17 +47,17 @@ export function Speaker() {
           <div className="label-mono border-b-4 border-ink bg-accent px-4 py-3 text-accent-foreground sm:px-6">
             {s.role}
           </div>
-          <Reveal delay={80}>
-            <p className="border-b-4 border-ink px-4 py-6 leading-relaxed sm:px-6 sm:text-lg">
+          <Reveal delay={80} className="flex-1 flex flex-col">
+            <p className="border-b-4 border-ink px-4 py-6 leading-relaxed sm:px-6 sm:text-lg flex-1">
               {s.bio}
             </p>
           </Reveal>
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap mt-auto">
             {s.links.map((l) => (
               <a
                 key={l.label}
                 href={l.href}
-                className="label-mono border-b-4 border-r-4 border-ink px-4 py-3 transition-colors duration-75 hover:bg-ink hover:text-paper sm:border-b-0"
+                className="label-mono border-r-4 border-ink px-4 py-3 transition-colors duration-75 hover:bg-ink hover:text-paper sm:border-r-4"
               >
                 {l.label} ↗
               </a>
