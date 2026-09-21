@@ -26,15 +26,18 @@ export function Footer() {
           {eventConfig.contact.email}
         </a>
         <div className="flex flex-wrap">
-          {eventConfig.contact.socials.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              className="label-mono border-r-4 border-paper px-4 py-4 last:border-r-0 hover:bg-accent hover:text-accent-foreground"
-            >
-              {s.label}
-            </a>
-          ))}
+          <a
+            href="https://www.instagram.com/k.win_._._._/"
+            className="label-mono border-r-4 border-paper px-4 py-4 last:border-r-0 hover:bg-accent hover:text-accent-foreground"
+          >
+            INSTAGRAM
+          </a>
+          <a
+            href="https://www.linkedin.com/in/kevinkr77"
+            className="label-mono border-r-4 border-paper px-4 py-4 last:border-r-0 hover:bg-accent hover:text-accent-foreground"
+          >
+            LINKEDIN
+          </a>
         </div>
       </div>
 

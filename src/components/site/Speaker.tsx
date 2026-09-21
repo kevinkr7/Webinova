@@ -53,7 +53,9 @@ export function Speaker() {
             </p>
           </Reveal>
           <div className="flex flex-wrap mt-auto">
-            {s.links.map((l) => (
+            {s.links
+              .filter((l) => l.label.toUpperCase() !== "WEBSITE")
+              .map((l) => (
               <a
                 key={l.label}
                 href={l.href}

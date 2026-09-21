@@ -45,15 +45,12 @@ function PersonBlock({ person, isLast }: { person: Person; isLast?: boolean }) {
           {person.role}
         </div>
         <div className="flex flex-wrap">
-          {person.links.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              className="label-mono border-r-4 border-ink px-4 py-3 transition-colors duration-75 hover:bg-ink hover:text-paper last:border-r-0"
-            >
-              {l.label} ↗
-            </a>
-          ))}
+          <a
+            href={person.heading === "ORGANIZED BY" ? "https://www.linkedin.com/in/kevinkr77" : "https://www.linkedin.com/in/mahasmritisivakumar/"}
+            className="label-mono border-r-4 border-ink px-4 py-3 transition-colors duration-75 hover:bg-ink hover:text-paper last:border-r-0"
+          >
+            LINKEDIN ↗
+          </a>
         </div>
       </div>
     </div>

@@ -50,7 +50,6 @@ export const eventConfig = {
     bio: "[SHORT BIO — 2 TO 3 LINES]",
     links: [
       { label: "LINKEDIN", href: "#" },
-      { label: "WEBSITE", href: "#" },
     ],
   },
 
@@ -60,8 +59,7 @@ export const eventConfig = {
     name: "[ORGANIZER NAME]",
     role: "[ORGANIZER ROLE / CLUB POSITION]",
     links: [
-      { label: "LINKEDIN", href: "#" },
-      { label: "MAIN", href: "#" },
+      { label: "LINKEDIN", href: "https://www.linkedin.com/in/kevinkr77" },
     ],
   },
 
@@ -71,8 +69,7 @@ export const eventConfig = {
     name: "[CO-ORGANIZER NAME]",
     role: "[CO-ORGANIZER ROLE / CLUB POSITION]",
     links: [
-      { label: "LINKEDIN", href: "#" },
-      { label: "MAIN", href: "#" },
+      { label: "LINKEDIN", href: "https://www.linkedin.com/in/mahasmritisivakumar/" },
     ],
   },
 
@@ -105,9 +102,8 @@ export const eventConfig = {
   contact: {
     email: "hello@codingdemystified.com",
     socials: [
-      { label: "INSTAGRAM", href: "#" },
-      { label: "LINKEDIN", href: "#" },
-      { label: "WEBSITE", href: "#" },
+      { label: "INSTAGRAM", href: "https://www.instagram.com/k.win_._._._/" },
+      { label: "LINKEDIN", href: "https://www.linkedin.com/in/kevinkr77" },
     ],
   },
 
