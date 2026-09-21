@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
+
+const PdfPreview = lazy(() => import('../components/admin/PdfPreview'));
 
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
@@ -258,41 +260,64 @@ function RegistrationsTab() {
   );
 }
 
+import { sendMassEmailsFn, previewCertificateFn } from "@/actions/admin-emails";
+
 function NotificationsTab() {
+  const [joinLink, setJoinLink] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [result, setResult] = useState<any>(null);
+
+  async function handleBroadcast() {
+    if (!joinLink) return alert("Please enter a join link.");
+    setStatus("sending");
+    try {
+      const res = await sendMassEmailsFn({ data: { type: "join_link", link: joinLink } });
+      setResult(res);
+      setStatus("done");
+    } catch (err: any) {
+      alert("Error: " + err.message);
+      setStatus("error");
+    }
+  }
+
   return (
     <div className="max-w-3xl">
       <h1 className="font-display text-4xl uppercase mb-8">Send Notification</h1>
       <div className="border-4 border-ink p-8 bg-white flex flex-col gap-6 shadow-[8px_8px_0_0_rgba(22,22,22,1)]">
         <p className="text-sm font-bold uppercase opacity-70 border-b-2 border-ink pb-4">
-          Broadcast a mass email to all registered participants.
+          Broadcast Microsoft Teams Join Link to all participants.
         </p>
 
         <div>
-          <label className="label-mono block mb-2">Subject</label>
+          <label className="label-mono block mb-2">Microsoft Teams Join Link</label>
           <input
-            type="text"
+            type="url"
             className="brut-input"
-            placeholder="e.g. Action Required: Microsoft Teams Link inside"
+            placeholder="https://teams.microsoft.com/l/meetup-join/..."
+            value={joinLink}
+            onChange={(e) => setJoinLink(e.target.value)}
           />
         </div>
 
-        <div>
-          <label className="label-mono block mb-2">Message Body (HTML Supported)</label>
-          <textarea
-            className="brut-input min-h-[200px]"
-            placeholder="Type your message here..."
-          ></textarea>
-        </div>
+        {status === "done" && result && (
+          <div className="bg-[#d1fae5] border-4 border-[#065f46] text-[#065f46] p-4 font-bold uppercase text-sm">
+            BROADCAST COMPLETE! <br />
+            Successfully sent: {result.success} <br />
+            Failed: {result.failed} <br />
+            {result.errors.length > 0 && <span className="text-xs opacity-80 mt-2 block break-all">{result.errors.join(", ")}</span>}
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-4">
           <button
             className="brut-btn"
-            onClick={() => alert("Backend integration required for mass sending.")}
+            onClick={handleBroadcast}
+            disabled={status === "sending"}
           >
-            BROADCAST NOW
+            {status === "sending" ? "SENDING..." : "BROADCAST LINK NOW"}
           </button>
           <span className="text-xs font-bold uppercase opacity-50 max-w-[200px]">
-            This action cannot be undone.
+            This action cannot be undone and sends an email to ALL participants.
           </span>
         </div>
       </div>
@@ -301,38 +326,224 @@ function NotificationsTab() {
 }
 
 function CertificatesTab() {
+  const [pdfDataUri, setPdfDataUri] = useState<string>("");
+  const [bbox, setBbox] = useState({ x: 0.1, y: 0.4, width: 0.8, height: 0.1 });
+  const [sampleName, setSampleName] = useState("JOHN DOE");
+  const [status, setStatus] = useState<"idle" | "previewing" | "sending" | "done" | "error">("idle");
+  const [result, setResult] = useState<any>(null);
+  
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/pdf") {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPdfDataUri(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid PDF file.");
+    }
+  }
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    // Constrain to 0-1
+    const boundedX = Math.max(0, Math.min(1, x));
+    const boundedY = Math.max(0, Math.min(1, y));
+
+    setStartPos({ x: boundedX, y: boundedY });
+    setBbox({ x: boundedX, y: boundedY, width: 0, height: 0 });
+    setIsDrawing(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDrawing || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const currentX = (e.clientX - rect.left) / rect.width;
+    const currentY = (e.clientY - rect.top) / rect.height;
+
+    // Constrain to 0-1
+    const boundedX = Math.max(0, Math.min(1, currentX));
+    const boundedY = Math.max(0, Math.min(1, currentY));
+
+    const newX = Math.min(startPos.x, boundedX);
+    const newY = Math.min(startPos.y, boundedY);
+    const newW = Math.abs(boundedX - startPos.x);
+    const newH = Math.abs(boundedY - startPos.y);
+
+    setBbox({ x: newX, y: newY, width: newW, height: newH });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    setIsDrawing(false);
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  };
+
+  async function handlePreview() {
+    if (!pdfDataUri) return alert("Please upload a PDF template first.");
+    setStatus("previewing");
+    try {
+      const base64Pdf = await previewCertificateFn({ data: { pdfBase64: pdfDataUri, bbox, sampleName } });
+      
+      const res = await fetch("data:application/pdf;base64," + base64Pdf);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      window.open(blobUrl, "_blank");
+      setStatus("idle");
+    } catch (err: any) {
+      alert("Preview Error: " + err.message);
+      setStatus("error");
+    }
+  }
+
+  async function handleGenerateAndSend() {
+    if (!pdfDataUri) return alert("Please upload a PDF template first.");
+    setStatus("sending");
+    try {
+      const res = await sendMassEmailsFn({ 
+        data: { 
+          type: "certificate", 
+          pdfBase64: pdfDataUri,
+          bbox: bbox
+        } 
+      });
+      setResult(res);
+      setStatus("done");
+    } catch (err: any) {
+      alert("Error: " + err.message);
+      setStatus("error");
+    }
+  }
+
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl pb-20">
       <h1 className="font-display text-4xl uppercase mb-8">Certificates</h1>
       <div className="border-4 border-ink p-8 bg-white flex flex-col gap-6 shadow-[8px_8px_0_0_rgba(22,22,22,1)]">
         <p className="text-sm font-bold uppercase opacity-70 border-b-2 border-ink pb-4">
           Generate and distribute certificates of participation.
         </p>
 
-        <div className="bg-secondary border-2 border-ink p-4 mb-2">
-          <p className="text-sm font-bold uppercase">Certificate Generation Engine</p>
-          <p className="text-xs mt-2 opacity-80">
-            This module will automatically merge Participant Names with your uploaded PDF template
-            and dispatch them via email.
-          </p>
-        </div>
-
         <div>
-          <label className="label-mono block mb-2">Upload Certificate Template (PDF)</label>
+          <label className="label-mono block mb-2">1. Upload Certificate Template (PDF)</label>
           <input
             type="file"
             className="brut-input bg-white cursor-pointer"
             accept="application/pdf"
+            onChange={handleFileChange}
           />
         </div>
 
-        <div className="flex items-center gap-4 mt-4">
+        {pdfDataUri && (
+          <>
+            <div className="border-2 border-ink p-4 bg-secondary">
+              <label className="label-mono block mb-4">2. Draw the Name Box directly on the PDF below!</label>
+              <p className="text-xs font-bold uppercase opacity-70 mb-4">
+                Click and drag over the preview to set the bounding box where the participant's name will be printed.
+              </p>
+              
+              <div 
+                ref={containerRef}
+                className="relative border-4 border-ink bg-gray-200 mt-4 overflow-hidden select-none touch-none cursor-crosshair w-full"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+              >
+                <div className="w-full flex justify-center bg-gray-100 pointer-events-none min-h-[400px]">
+                  {typeof window !== 'undefined' && (
+                    <Suspense fallback={<div className="flex items-center justify-center p-12 text-sm font-bold uppercase opacity-50">Loading PDF engine...</div>}>
+                      <PdfPreview 
+                        pdfDataUri={pdfDataUri} 
+                        width={containerRef.current?.clientWidth || 600} 
+                      />
+                    </Suspense>
+                  )}
+                </div>
+                
+                {(bbox.width > 0 || isDrawing) && (
+                  <div 
+                    className="absolute border-4 border-red-500 bg-red-500/30 flex items-center justify-center pointer-events-none"
+                    style={{ 
+                      left: `${bbox.x * 100}%`, 
+                      top: `${bbox.y * 100}%`, 
+                      width: `${bbox.width * 100}%`, 
+                      height: `${bbox.height * 100}%` 
+                    }}
+                  >
+                    <span className="text-red-900 bg-white/90 px-2 py-1 font-bold font-display uppercase tracking-widest text-center whitespace-nowrap overflow-hidden text-ellipsis">
+                      {sampleName || "PARTICIPANT NAME"}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-4">
+                <div>
+                  <label className="text-xs font-bold">X Position</label>
+                  <input type="number" step="0.01" min="0" max="1" className="brut-input py-1" value={bbox.x.toFixed(4)} readOnly />
+                </div>
+                <div>
+                  <label className="text-xs font-bold">Y Position</label>
+                  <input type="number" step="0.01" min="0" max="1" className="brut-input py-1" value={bbox.y.toFixed(4)} readOnly />
+                </div>
+                <div>
+                  <label className="text-xs font-bold">Width</label>
+                  <input type="number" step="0.01" min="0" max="1" className="brut-input py-1" value={bbox.width.toFixed(4)} readOnly />
+                </div>
+                <div>
+                  <label className="text-xs font-bold">Height</label>
+                  <input type="number" step="0.01" min="0" max="1" className="brut-input py-1" value={bbox.height.toFixed(4)} readOnly />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label className="text-xs font-bold block mb-1">Sample Name for Preview</label>
+                <input type="text" className="brut-input py-1 max-w-sm" value={sampleName} onChange={(e) => setSampleName(e.target.value)} />
+              </div>
+              
+              <div className="mt-6 flex flex-col sm:flex-row gap-4 items-center border-t-2 border-ink pt-4">
+                <button
+                  type="button"
+                  onClick={handlePreview}
+                  disabled={status === "previewing"}
+                  className="bg-ink text-paper font-bold px-6 py-2 uppercase text-sm border-2 border-ink hover:bg-paper hover:text-ink transition-colors disabled:opacity-50"
+                >
+                  {status === "previewing" ? "GENERATING..." : "PREVIEW SAMPLE CERTIFICATE"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {status === "done" && result && (
+          <div className="bg-[#d1fae5] border-4 border-[#065f46] text-[#065f46] p-4 font-bold uppercase text-sm mt-4">
+            CERTIFICATE GENERATION COMPLETE! <br />
+            Successfully generated and sent: {result.success} <br />
+            Failed: {result.failed} <br />
+            {result.errors.length > 0 && <span className="text-xs opacity-80 mt-2 block break-all">{result.errors.join(", ")}</span>}
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-8 pt-6 border-t-4 border-ink">
           <button
             className="brut-btn"
-            onClick={() => alert("Backend integration required for certificate generation.")}
+            onClick={handleGenerateAndSend}
+            disabled={status === "sending" || !pdfDataUri}
           >
-            GENERATE & SEND ALL
+            {status === "sending" ? "GENERATING & SENDING..." : "GENERATE & SEND ALL"}
           </button>
+          <span className="text-xs font-bold uppercase opacity-50 max-w-[200px]">
+            This action generates PDFs and sends emails to ALL participants.
+          </span>
         </div>
       </div>
     </div>

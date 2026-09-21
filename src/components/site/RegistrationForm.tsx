@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { z } from "zod";
 import { useEventConfig } from "@/context/EventConfigContext";
 import { registerParticipantFn } from "@/actions/register";
@@ -33,9 +33,18 @@ export function RegistrationForm() {
   const eventConfig = useEventConfig();
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "redundant">("idle");
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (status === "done" || status === "redundant") {
+    if (status === "done" && bannerRef.current) {
+      setTimeout(() => {
+        bannerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 500);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (status === "redundant") {
       const timer = setTimeout(() => {
         setStatus("idle");
       }, 3000);
@@ -80,7 +89,8 @@ export function RegistrationForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid md:grid-cols-2">
+    <>
+      <form onSubmit={onSubmit} noValidate className="grid md:grid-cols-2">
       {textFields.map((f, i) => (
         <div
           key={f.name}
@@ -192,7 +202,7 @@ export function RegistrationForm() {
         ) : null}
         <button
           type="submit"
-          disabled={status === "sending"}
+          disabled={status === "sending" || status === "done"}
           className={[
             "display group flex w-full items-center justify-between gap-6 border-b-4 border-ink px-4 py-8 text-3xl transition-colors duration-500 disabled:opacity-70 sm:px-6 sm:text-5xl",
             status === "idle" || status === "sending"
@@ -215,5 +225,27 @@ export function RegistrationForm() {
         </button>
       </div>
     </form>
+    
+    {status === "done" && (
+      <div ref={bannerRef} className="flex flex-col items-center justify-center p-12 border-t-4 border-ink bg-[#d1fae5] text-center">
+        <h3 className="font-display text-4xl uppercase mb-4 text-[#065f46]">Registration Successful!</h3>
+        <p className="font-bold text-lg mb-8 text-[#065f46]">Please join our official WhatsApp group for all webinar updates and links.</p>
+        
+        <div className="bg-white border-4 border-ink p-4 mb-8 shadow-[8px_8px_0_0_rgba(22,22,22,1)] hover:-translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0_0_rgba(22,22,22,1)] transition-all">
+          <img src="/qr_IdeasUnleashed.jpeg" alt="WhatsApp QR Code" className="w-48 h-48 sm:w-64 sm:h-64 object-contain" />
+        </div>
+        
+        <a 
+          href="https://chat.whatsapp.com/FexKuirX1zKHZll2PCVLwF" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="display group flex items-center justify-between gap-6 border-4 border-ink bg-white px-6 py-4 text-2xl transition-colors duration-300 hover:bg-ink hover:text-white"
+        >
+          <span>JOIN WHATSAPP GROUP</span>
+          <span className="transition-transform duration-75 group-hover:translate-x-2">→</span>
+        </a>
+      </div>
+    )}
+    </>
   );
 }
