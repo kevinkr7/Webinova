@@ -41,6 +41,7 @@ export function RegistrationForm() {
       }, 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [status]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {

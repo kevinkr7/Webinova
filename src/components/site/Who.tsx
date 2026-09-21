@@ -9,10 +9,10 @@ export function Who() {
       <SectionLabel>
         <span>03</span>
         <span>/</span>
-        <span>{eventConfig.audience?.heading || "WHO IS THIS FOR?"}</span>
+        <span>{(eventConfig.audience as any)?.heading || "WHO IS THIS FOR?"}</span>
       </SectionLabel>
 
-      <div className={`grid ${eventConfig.audience.blocks.length === 1 ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
+      <div className={`grid ${(eventConfig.audience.blocks.length as number) === 1 ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
         {eventConfig.audience.blocks.map((b, i) => (
           <Reveal
             key={b.index}
