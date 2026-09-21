@@ -6,7 +6,9 @@ const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, 
 const supabaseAnonKey = (import.meta as any).env['VITE_SUPABASE_ANON_KEY'] || "";
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase environment variables are missing.");
+  console.warn("Supabase environment variables are missing. Client will not be initialized.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : (null as any);
